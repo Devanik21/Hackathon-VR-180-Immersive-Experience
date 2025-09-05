@@ -6,5 +6,8 @@ torchvision
 transformers
 google-generativeai
 moviepy
+imageio
+imageio-ffmpeg
+decorator
+proglog
 numpy
-
