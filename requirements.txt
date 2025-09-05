@@ -1,0 +1,10 @@
+streamlit
+opencv-python-headless
+pillow
+torch
+torchvision
+transformers
+google-generativeai
+moviepy
+numpy
+tempfile-rotate
