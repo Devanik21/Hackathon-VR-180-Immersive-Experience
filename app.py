@@ -137,7 +137,7 @@ def get_gemini_insights(frame_sample):
     """Get AI insights about the video content for better depth processing"""
     if st.session_state.gemini_api_key:
         try:
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel('gemini-2.5-flash')
             
             # Convert frame to PIL Image for Gemini
             pil_image = Image.fromarray(frame_sample)
