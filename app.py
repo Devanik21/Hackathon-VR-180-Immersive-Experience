@@ -241,7 +241,7 @@ def process_video_to_vr180(video_file):
         
         # Use moviepy to create video
         clip = ImageSequenceClip(stereo_frames, fps=fps/2)  # Reduce fps due to processing
-        clip.write_videofile(output_path, codec='libx264', verbose=False, logger=None)
+        clip.write_videofile(output_path, codec='libx264', verbose=False)
         
         st.session_state.processing_status = "VR 180 video created successfully!"
         
