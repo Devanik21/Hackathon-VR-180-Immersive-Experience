@@ -137,7 +137,7 @@ def get_gemini_insights(frame_sample):
     """Get AI insights about the video content for better depth processing"""
     if st.session_state.gemini_api_key:
         try:
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             
             # Convert frame to PIL Image for Gemini
             pil_image = Image.fromarray(frame_sample)
@@ -198,13 +198,32 @@ def process_video_to_vr180(video_file):
         progress_bar = st.progress(0)
         
         for i, frame in enumerate(frames):
-            # Generate depth map
-            depth_map = generate_depth_map(frame, processor, model)
-            
-            if depth_map is not None:
-                # Create stereoscopic frame
-                stereo_frame = create_stereoscopic_frame(frame, depth_map)
-                stereo_frames.append(stereo_frame)
+            try:
+                st.session_state.processing_status = f"Processing frame {i+1}/{len(frames)}..."
+                
+                # Debug info
+                st.write(f"Frame {i}: shape = {frame.shape}")
+                
+                # Generate depth map
+                depth_map = generate_depth_map(frame, processor, model)
+                
+                if depth_map is not None:
+                    st.write(f"Depth map {i}: shape = {depth_map.shape}")
+                    
+                    # Create stereoscopic frame
+                    stereo_frame = create_stereoscopic_frame(frame, depth_map)
+                    
+                    if stereo_frame is not None:
+                        stereo_frames.append(stereo_frame)
+                        st.write(f"Stereo frame {i}: shape = {stereo_frame.shape}")
+                    else:
+                        st.warning(f"Failed to create stereo frame {i}")
+                else:
+                    st.warning(f"Failed to generate depth map for frame {i}")
+                
+            except Exception as e:
+                st.error(f"Error processing frame {i}: {str(e)}")
+                continue
             
             # Update progress
             progress_bar.progress((i + 1) / len(frames))
