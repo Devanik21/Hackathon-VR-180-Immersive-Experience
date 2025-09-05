@@ -55,7 +55,7 @@ def load_depth_model():
         return None, None
 
 # Extract frames from video
-def extract_frames(video_path, max_frames=1):
+def extract_frames(video_path, max_frames=100):
     """Extract frames from video for processing"""
     cap = cv2.VideoCapture(video_path)
     frames = []
