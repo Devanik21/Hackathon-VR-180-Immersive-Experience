@@ -7,4 +7,4 @@ transformers
 google-generativeai
 moviepy
 numpy
-tempfile-rotate
+
