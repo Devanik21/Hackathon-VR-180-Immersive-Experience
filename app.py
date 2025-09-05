@@ -108,28 +108,28 @@ def create_stereoscopic_frame(frame, depth_map, baseline=0.1):
     """Create left and right eye views for VR 180"""
     height, width = frame.shape[:2]
 
+    # --- THE FIX ---
+    # The original depth_map has a fixed size (e.g., 384x384) from the AI model.
+    # We MUST resize it to match the video frame's dimensions (e.g., 640x360).
     depth_map_resized = cv2.resize(depth_map, (width, height), interpolation=cv2.INTER_LINEAR)
-    
-    # Create disparity map
+
+    # Now, use the CORRECTED `depth_map_resized` variable for all calculations.
     max_disparity = int(width * baseline)
-    disparity = (depth_map * max_disparity).astype(np.int32)
+    disparity = (depth_map_resized * max_disparity).astype(np.int32) # <<< Ensure you are using depth_map_resized here!
     
-    # Create left and right images
+    # The rest of the function remains the same, but it's now using correctly-sized data.
     left_img = frame.copy()
     right_img = np.zeros_like(frame)
     
-    # Simple depth-based shifting for stereoscopic effect
     for y in range(height):
         for x in range(width):
             shift = disparity[y, x]
             new_x = min(width - 1, max(0, x - shift))
             right_img[y, new_x] = frame[y, x]
     
-    # Fill holes in right image using interpolation
     mask = np.all(right_img == 0, axis=2)
     right_img[mask] = left_img[mask]
     
-    # Combine for side-by-side VR 180 format
     stereo_frame = np.hstack([left_img, right_img])
     
     return stereo_frame
