@@ -107,6 +107,8 @@ def generate_depth_map(frame, processor, model):
 def create_stereoscopic_frame(frame, depth_map, baseline=0.1):
     """Create left and right eye views for VR 180"""
     height, width = frame.shape[:2]
+
+    depth_map_resized = cv2.resize(depth_map, (width, height), interpolation=cv2.INTER_LINEAR)
     
     # Create disparity map
     max_disparity = int(width * baseline)
