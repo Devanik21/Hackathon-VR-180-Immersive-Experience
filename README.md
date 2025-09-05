@@ -141,7 +141,7 @@ CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0
 
 ### Models Used
 - **Intel DPT-Large**: Primary depth estimation model
-- **Google Gemini 1.5**: Content analysis and optimization
+- **Google Gemini 2.5**: Content analysis and optimization
 - **Custom Stereoscopic Algorithm**: Proprietary depth-to-stereo conversion
 
 ### Processing Capabilities
