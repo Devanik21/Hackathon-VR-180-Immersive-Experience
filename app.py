@@ -275,53 +275,56 @@ def main():
             help="Upload your 2D video to convert to VR 180 format"
         )
         
+        # --- FIX STARTS HERE ---
+
         if uploaded_file is not None:
+            # When a new file is uploaded, reset the state
+            if st.session_state.get('processed_video_path') and uploaded_file.name != st.session_state.get('last_file_name'):
+                st.session_state.processed_video_path = None
+                st.session_state.processing_status = ""
+
             st.video(uploaded_file)
             
-            # Processing options
+            # Conversion Settings
             st.subheader("Conversion Settings")
-            
             col_a, col_b = st.columns(2)
-            
             with col_a:
-                depth_strength = st.slider(
-                    "Depth Effect Strength",
-                    min_value=0.05,
-                    max_value=0.3,
-                    value=0.1,
-                    step=0.01,
-                    help="Higher values create more pronounced 3D effect"
-                )
-            
+                depth_strength = st.slider("Depth Effect Strength", 0.05, 0.3, 0.1, 0.01)
             with col_b:
-                quality_setting = st.selectbox(
-                    "Processing Quality",
-                    ["Fast (Low Quality)", "Balanced", "High Quality (Slow)"],
-                    index=1
-                )
+                quality_setting = st.selectbox("Processing Quality", ["Fast (Low Quality)", "Balanced", "High Quality (Slow)"], index=1)
             
-            # Convert button
+            # --- LOGIC CHANGE PART 1: The Convert Button ---
+            # This button's only job is to start the process and set the session state.
             if st.button("🚀 Convert to VR 180", type="primary"):
                 if not has_gemini:
                     st.warning("For best results, please provide a Gemini API key in the sidebar")
                 
                 with st.spinner("Processing video..."):
                     result_path = process_video_to_vr180(uploaded_file)
-                    
                     if result_path:
                         st.session_state.processed_video_path = result_path
-                        st.success("✅ Conversion completed!")
-                        
-                        # Show download button
-                        with open(result_path, 'rb') as f:
-                            st.download_button(
-                                "📥 Download VR 180 Video",
-                                data=f.read(),
-                                file_name="converted_vr180.mp4",
-                                mime="video/mp4"
-                            )
-                        
-                        st.info("Your VR 180 video is ready! You can now view it in any VR headset that supports side-by-side 180° content.")
+                        st.session_state.last_file_name = uploaded_file.name # Remember which file was processed
+            
+            # --- LOGIC CHANGE PART 2: The Download Button ---
+            # This block is now OUTSIDE the 'if st.button' block.
+            # It runs if a video has been successfully processed in the current session.
+            if st.session_state.get('processed_video_path'):
+                st.success("✅ Conversion completed!")
+                
+                try:
+                    with open(st.session_state.processed_video_path, 'rb') as f:
+                        st.download_button(
+                            "📥 Download VR 180 Video",
+                            data=f.read(),
+                            file_name="converted_vr180.mp4",
+                            mime="video/mp4"
+                        )
+                    st.info("Your VR 180 video is ready! You can now view it in any VR headset.")
+                except FileNotFoundError:
+                    st.error("The processed video file was not found. This can happen if the app restarts. Please convert the video again.")
+                    st.session_state.processed_video_path = None # Reset state
+
+        # --- FIX ENDS HERE ---
     
     with col2:
         st.header("How It Works")
