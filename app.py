@@ -55,7 +55,7 @@ def load_depth_model():
         return None, None
 
 # Extract frames from video
-def extract_frames(video_path, max_frames=10):
+def extract_frames(video_path, max_frames=100):
     """Extract frames from video for processing"""
     cap = cv2.VideoCapture(video_path)
     frames = []
@@ -139,7 +139,7 @@ def get_gemini_insights(frame_sample):
     """Get AI insights about the video content for better depth processing"""
     if st.session_state.gemini_api_key:
         try:
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel('gemini-2.5-flash')
             
             # Convert frame to PIL Image for Gemini
             pil_image = Image.fromarray(frame_sample)
